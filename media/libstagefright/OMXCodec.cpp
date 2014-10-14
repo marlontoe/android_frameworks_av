@@ -4636,7 +4636,7 @@ status_t OMXCodec::setFLACFormat(const sp<MetaData> &meta)
 {
     int32_t numChannels = 0;
     int32_t sampleRate = 0;
-    int32_t bitsPerSample = 16;
+    int32_t bitsPerSample = 0;
     OMX_AUDIO_PARAM_FLACTYPE param;
 
     if (mIsEncoder) {
@@ -4646,12 +4646,10 @@ status_t OMXCodec::setFLACFormat(const sp<MetaData> &meta)
 
     CHECK(meta->findInt32(kKeyChannelCount, &numChannels));
     CHECK(meta->findInt32(kKeySampleRate, &sampleRate));
-    if (!meta->findInt32(kKeySampleBits, &bitsPerSample)) {
-        CODEC_LOGV("BitsPerSample not set, using default");
-    }
+    CHECK(meta->findInt32(kKeySampleBits, &bitsPerSample));
 
-    CODEC_LOGV("Channels: %d, SampleRate: %d, BitsPerSample: %d",
-            numChannels, sampleRate, bitsPerSample);
+    CODEC_LOGV("Channels: %d, SampleRate: %d",
+            numChannels, sampleRate);
 
     InitOMXParams(&param);
     param.nPortIndex = kPortIndexInput;
@@ -4663,7 +4661,7 @@ status_t OMXCodec::setFLACFormat(const sp<MetaData> &meta)
 
     param.nChannels = numChannels;
     param.nSampleRate = sampleRate;
-    param.nBitsPerSample = bitsPerSample;
+    //param.nBitsPerSample = bitsPerSample;
 
     err = mOMX->setParameter(
             mNode, OMX_IndexParamAudioFlac, &param, sizeof(param));
